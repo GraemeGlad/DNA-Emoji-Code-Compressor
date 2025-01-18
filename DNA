@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DNA/Emoji Code Compressor</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        textarea {
+            width: 100%;
+            height: 150px;
+            margin-bottom: 10px;
+            font-family: monospace;
+        }
+        button {
+            padding: 10px 20px;
+            margin-right: 10px;
+            font-size: 16px;
+        }
+        #outputCode {
+            background-color: #f9f9f9;
+        }
+        .stats {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #555;
+        }
+        #visualizer {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            background-color: #f9f9f9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>DNA/Emoji Code Compressor</h1>
+        <textarea id="inputCode" placeholder="Enter code here..."></textarea>
+        <button id="compressButton">Compress</button>
+        <button id="decompressButton">Decompress</button>
+        <textarea id="outputCode" readonly></textarea>
+        
+        <!-- Visualization container -->
+        <div id="visualizer"></div>
+
+        <div class="stats">
+            <p>Original Size: <span id="originalSize">0</span> bytes</p>
+            <p>Compressed Size: <span id="compressedSize">0</span> bytes</p>
+            <p>Compression Ratio: <span id="compressionRatio">0%</span></p>
+        </div>
+    </div>
+
+    <script>
+class DNAEmojiCompressor {
+    constructor() {
+        this.emojiMap = new Map([
+            ['function', 'ƒ'],
+            ['return', '↵'],
+            ['if', '?'],
+            ['else', ':'],
+            ['for', '↻'],
+            ['console.log', '📝'],
+            ['let', '🅻'],
+            ['const', '🅲'],
+            ['var', '🆅'],
+            ['true', '✅'],
+            ['false', '❌'],
+            ['null', '🅽'],
+            ['undefined', '🆄'],
+            ['this', '🆃'],
+            ['new', '🆕'],
+            ['=>', '➡️'],
+            ['===', '🟰'],
+            ['!==', '❌🟰'],
+            ['&&', '🔗'],
+            ['||', '🔀']
+        ]);
+    }
+
+    compress(code) {
+        let compressed = code;
+        for (const [keyword, emoji] of this.emojiMap) {
+            compressed = compressed.replace(new RegExp(keyword, 'g'), emoji);
+        }
+        return compressed;
+    }
+
+    decompress(code) {
+        let decompressed = code;
+        for (const [keyword, emoji] of this.emojiMap) {
+            decompressed = decompressed.replace(new RegExp(emoji, 'g'), keyword);
+        }
+        return decompressed;
+    }
+}
+
+const compressor = new DNAEmojiCompressor();
+
+// Update stats in the UI
+function updateStats(originalSize, compressedSize) {
+    document.getElementById('originalSize').textContent = originalSize;
+    document.getElementById('compressedSize').textContent = compressedSize;
+    const ratio = ((1 - compressedSize / originalSize) * 100).toFixed(2);
+    document.getElementById('compressionRatio').textContent = `${ratio}%`;
+}
+
+// Visualization without React
+function visualizeCompression(input, compressed) {
+    const visualizer = document.getElementById('visualizer');
+    visualizer.innerHTML = `
+        <h3>Input Code</h3>
+        <pre>${input}</pre>
+        <h3>Compressed Code</h3>
+        <pre>${compressed}</pre>
+    `;
+}
+
+// Event listeners
+document.getElementById('compressButton').addEventListener('click', () => {
+    const input = document.getElementById('inputCode').value;
+    const compressed = compressor.compress(input);
+    document.getElementById('outputCode').value = compressed;
+    updateStats(input.length, compressed.length);
+    visualizeCompression(input, compressed);
+});
+
+document.getElementById('decompressButton').addEventListener('click', () => {
+    const compressed = document.getElementById('outputCode').value;
+    const decompressed = compressor.decompress(compressed);
+    document.getElementById('outputCode').value = decompressed;
+    updateStats(decompressed.length, compressed.length);
+    visualizeCompression(compressed, decompressed);
+});
+    </script>
+</body>
+</html>
