@@ -3,19 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DNA/Emoji Code Compressor</title>
+    <title>Advanced Code Compressor</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             margin: 20px;
         }
         .container {
-            max-width: 800px;
+            max-width: 1000px;
             margin: 0 auto;
+        }
+        .textarea-container {
+            display: flex;
+            gap: 20px;
         }
         textarea {
             width: 100%;
-            height: 150px;
+            height: 200px;
             margin-bottom: 10px;
             font-family: monospace;
         }
@@ -24,33 +28,35 @@
             margin-right: 10px;
             font-size: 16px;
         }
-        #outputCode {
-            background-color: #f9f9f9;
-        }
         .stats {
             margin-top: 20px;
             font-size: 14px;
             color: #555;
         }
-        #visualizer {
-            margin-top: 20px;
-            padding: 10px;
-            border: 1px solid #ddd;
-            background-color: #f9f9f9;
+        .panel {
+            flex: 1;
+        }
+        .panel h2 {
+            font-size: 18px;
+            margin-bottom: 10px;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>DNA/Emoji Code Compressor</h1>
-        <textarea id="inputCode" placeholder="Enter code here..."></textarea>
+        <h1>Advanced Code Compressor</h1>
+        <div class="textarea-container">
+            <div class="panel">
+                <h2>Original Code</h2>
+                <textarea id="inputCode" placeholder="Enter code here..."></textarea>
+            </div>
+            <div class="panel">
+                <h2>Output Code</h2>
+                <textarea id="outputCode" readonly></textarea>
+            </div>
+        </div>
         <button id="compressButton">Compress</button>
         <button id="decompressButton">Decompress</button>
-        <textarea id="outputCode" readonly></textarea>
-        
-        <!-- Visualization container -->
-        <div id="visualizer"></div>
-
         <div class="stats">
             <p>Original Size: <span id="originalSize">0</span> bytes</p>
             <p>Compressed Size: <span id="compressedSize">0</span> bytes</p>
@@ -59,85 +65,103 @@
     </div>
 
     <script>
-class DNAEmojiCompressor {
+class AdvancedCompressor {
     constructor() {
-        this.emojiMap = new Map([
-            ['function', 'ƒ'],
-            ['return', '↵'],
-            ['if', '?'],
-            ['else', ':'],
-            ['for', '↻'],
-            ['console.log', '📝'],
-            ['let', '🅻'],
-            ['const', '🅲'],
-            ['var', '🆅'],
-            ['true', '✅'],
-            ['false', '❌'],
-            ['null', '🅽'],
-            ['undefined', '🆄'],
-            ['this', '🆃'],
-            ['new', '🆕'],
-            ['=>', '➡️'],
-            ['===', '🟰'],
-            ['!==', '❌🟰'],
-            ['&&', '🔗'],
-            ['||', '🔀']
-        ]);
+        this.compressionMap = [
+            ['function', '§'],
+            ['return', '¶'],
+            ['const', '¤'],
+            ['let', '£'],
+            ['var', '¥'],
+            ['while', 'Ω'],
+            ['if', '¿'],
+            ['else', '¡'],
+            ['true', '†'],
+            ['false', '‡'],
+            ['null', '∅'],
+            ['undefined', '℧'],
+            ['this', '∂'],
+            ['console.log', '∆'],
+            ['for', '∀'],
+            ['document', '◊'],
+            ['window', '∇'],
+            ['getElementById', '∞'],
+            ['addEventListener', '↯'],
+            ['setTimeout', '∑'],
+            ['setInterval', 'π'],
+            ['Math', 'μ'],
+            ['Date', 'Σ']
+        ];
+    }
+
+    getByteLength(str) {
+        return new TextEncoder().encode(str).length;
+    }
+
+    escapeRegExp(string) {
+        return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    }
+
+    removeWhitespace(code) {
+        code = code.replace(/\/\*[\s\S]*?\*\/|\/\/.*(?=[\n\r])/g, ''); // Remove comments
+        code = code.replace(/\s+/g, ' '); // Collapse whitespace
+        code = code.replace(/\s*([!~\{\}\[\]<>=+\-*/%&\|^.,;:])\s*/g, '$1'); // Trim around operators
+        return code.trim();
     }
 
     compress(code) {
-        let compressed = code;
-        for (const [keyword, emoji] of this.emojiMap) {
-            compressed = compressed.replace(new RegExp(keyword, 'g'), emoji);
+        let compressed = this.removeWhitespace(code);
+        for (const [keyword, replacement] of this.compressionMap) {
+            const regex = new RegExp(this.escapeRegExp(keyword), 'g');
+            compressed = compressed.replace(regex, replacement);
         }
         return compressed;
     }
 
     decompress(code) {
         let decompressed = code;
-        for (const [keyword, emoji] of this.emojiMap) {
-            decompressed = decompressed.replace(new RegExp(emoji, 'g'), keyword);
+        for (const [keyword, replacement] of this.compressionMap) {
+            const regex = new RegExp(this.escapeRegExp(replacement), 'g');
+            decompressed = decompressed.replace(regex, keyword);
         }
+        decompressed = decompressed
+            .replace(/([{}])/g, '$1\n')
+            .replace(/;/g, ';\n')
+            .replace(/\{\n/g, '{\n  ')
+            .replace(/\}\n/g, '\n}\n');
         return decompressed;
     }
 }
 
-const compressor = new DNAEmojiCompressor();
+const compressor = new AdvancedCompressor();
 
-// Update stats in the UI
-function updateStats(originalSize, compressedSize) {
-    document.getElementById('originalSize').textContent = originalSize;
-    document.getElementById('compressedSize').textContent = compressedSize;
-    const ratio = ((1 - compressedSize / originalSize) * 100).toFixed(2);
+function updateStats(originalText, processedText) {
+    const originalBytes = compressor.getByteLength(originalText);
+    const processedBytes = compressor.getByteLength(processedText);
+
+    document.getElementById('originalSize').textContent = originalBytes;
+    document.getElementById('compressedSize').textContent = processedBytes;
+
+    const ratio = ((1 - processedBytes / originalBytes) * 100).toFixed(2);
     document.getElementById('compressionRatio').textContent = `${ratio}%`;
 }
 
-// Visualization without React
-function visualizeCompression(input, compressed) {
-    const visualizer = document.getElementById('visualizer');
-    visualizer.innerHTML = `
-        <h3>Input Code</h3>
-        <pre>${input}</pre>
-        <h3>Compressed Code</h3>
-        <pre>${compressed}</pre>
-    `;
-}
+// Event Listeners
+const inputCodeElement = document.getElementById('inputCode');
+const outputCodeElement = document.getElementById('outputCode');
 
-// Event listeners
 document.getElementById('compressButton').addEventListener('click', () => {
-    const input = document.getElementById('inputCode').value;
-    const compressed = compressor.compress(input);
-    document.getElementById('outputCode').value = compressed;
-    updateStats(input.length, compressed.length);
-    visualizeCompression(input, compressed);
+    const inputCode = inputCodeElement.value;
+    const compressedCode = compressor.compress(inputCode);
+    outputCodeElement.value = compressedCode;
+    updateStats(inputCode, compressedCode);
 });
 
 document.getElementById('decompressButton').addEventListener('click', () => {
-    const compressed = document.getElementById('outputCode').value;
-    const decompressed = compressor.decompress(compressed);
-    document.getElementById('outputCode').value = decompressed;
-    updateStats(decompressed.length, compressed.length);
-    visualizeCompression(compressed, decompressed);
+    const compressedCode = outputCodeElement.value;
+    const decompressedCode = compressor.decompress(compressedCode);
+    outputCodeElement.value = decompressedCode;
+    updateStats(decompressedCode, compressedCode);
 });
     </script>
 </body>
